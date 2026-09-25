@@ -4,29 +4,34 @@ mod initial_permutation;
 use hexa2binar::hexa2binars;
 use initial_permutation::initial_permutation;
 
-// Fonction de chiffrement (pour l'instant : Hexa -> Binaire -> Permutation Initiale IP)
 pub fn chiffrement(input_hex: &str) -> String {
     let sens_hexa_to_bin = false;
     
-    // 1. On convertit l'hexadécimal en binaire (64 bits)
     let binaire = hexa2binars(input_hex, &sens_hexa_to_bin);
-    
-    // 2. On applique la permutation initiale (IP)
     let perm_vec = initial_permutation(&binaire, &sens_hexa_to_bin);
     
-    // Conversion du Vec<u8> en String pour le résultat
+    // Séparation du bloc en deux moitiés (L0 et R0)
+    let _l0 = &perm_vec[0..32];
+    let _r0 = &perm_vec[32..64];
+
+    // Pour l'instant on retourne le vecteur complet en String
     perm_vec.iter().map(|b| (b + b'0') as char).collect()
 }
 
-// Fonction de déchiffrement (pour l'instant : Permutation Inverse IP^-1 -> Binaire -> Hexa)
 pub fn dechiffrement(input_perm_bin: &str) -> String {
     let sens_inverse = true;
     
-    // 1. On applique la permutation inverse (IP^-1)
     let bin_vec = initial_permutation(input_perm_bin, &sens_inverse);
-    let bin_str: String = bin_vec.iter().map(|b| (b + b'0') as char).collect();
     
-    // 2. On reconvertit le binaire en hexadécimal d'origine
+    // On simule la récupération des deux moitiés à la fin des rondes
+    let l_final = &bin_vec[0..32];
+    let r_final = &bin_vec[32..64];
+    
+    // Réciproque de la séparation : on recolle les morceaux pour reformer les 64 bits
+    let combined_vec: Vec<u8> = [l_final, r_final].concat();
+    
+    let bin_str: String = combined_vec.iter().map(|b| (b + b'0') as char).collect();
+    
     hexa2binars(&bin_str, &sens_inverse)
 }
 
