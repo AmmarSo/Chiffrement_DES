@@ -2,20 +2,22 @@ mod hexa2binar;
 mod initial_permutation;
 mod key_permutation;
 mod circular_shift;
+mod second_key_permutation;
 
 use hexa2binar::hexa2binars;
 use initial_permutation::initial_permutation;
 use key_permutation::key_permutation;
 use circular_shift::circular_shift;
+use second_key_permutation::second_key_permutation;
 
 pub fn chiffrement(input_hex: &str, k: &str) -> String {
     let sens = false;
     
-    // Passage du message et de la clé en binaire
+    // Passage du message et de la clé en binaire (64 bits)
     let binaire = hexa2binars(input_hex, &sens);
     let binary_key = hexa2binars(k, &sens);
     
-    // Application des permutations initiales (IP et PC-1)
+    // Permutations initiales (IP et PC-1)
     let perm_vec = initial_permutation(&binaire, &sens);
     let key_56 = key_permutation(&binary_key, &sens);
     
@@ -27,10 +29,13 @@ pub fn chiffrement(input_hex: &str, k: &str) -> String {
     let c = &key_56[0..28];
     let d = &key_56[28..56];
 
-    // Exemple de test du décalage pour le premier tour
-    let (_c1, _d1) = circular_shift(c, d, 1, &sens);
+    // Exemple pour le tour 1 : décalage puis génération de la sous-clé K1 (PC-2)
+    let (c1, d1) = circular_shift(c, d, 1, &sens);
+    let k1 = second_key_permutation(&c1, &d1, &sens);
+    
+    println!("Taille de la sous-clé K1 générée : {} bits", k1.len());
 
-    // Retourne le bloc après IP sous forme de chaîne
+    // Retourne le bloc après IP sous forme de chaîne (pour l'instant)
     perm_vec.iter().map(|b| (b + b'0') as char).collect()
 }
 

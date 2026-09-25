@@ -1,5 +1,4 @@
 pub fn circular_shift(c: &[u8], d: &[u8], round: usize, sens: &bool) -> (Vec<u8>, Vec<u8>) {
-    // Table des décalages circulaires (1 à 16)[cite: 1]
     const SHIFT_TABLE: [usize; 16] = [
         1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1
     ];
@@ -11,8 +10,8 @@ pub fn circular_shift(c: &[u8], d: &[u8], round: usize, sens: &bool) -> (Vec<u8>
     let mut d_shifted = d.to_vec();
 
     if !*sens {
-        c_shifted.rotate_left(shift_amount);[cite: 1]
-        d_shifted.rotate_left(shift_amount);[cite: 1]
+        c_shifted.rotate_left(shift_amount);
+        d_shifted.rotate_left(shift_amount);
     } else {
         c_shifted.rotate_right(shift_amount);
         d_shifted.rotate_right(shift_amount);
