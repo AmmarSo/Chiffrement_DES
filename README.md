@@ -1,6 +1,6 @@
 # DES Implementation in Rust
 
-This repository contains a **Rust implementation of the Data Encryption Standard (DES)** developed as part of a **engineering school (EPISEN) project in cryptography and security protocols**.
+This repository contains a **Rust implementation of the Data Encryption Standard (DES)** developed as part of a **university project in cryptography and security protocols**.
 
 The main objective of this project is educational: implementing the different components of DES manually in order to better understand the internal mechanisms of a symmetric block cipher.
 
@@ -96,4 +96,74 @@ Handles hexadecimal-to-binary and binary-to-hexadecimal conversions.
 Implements the DES Initial Permutation and its inverse.
 
 `key_permutation.rs`  
-Implements the PC-1 permutation used to transform
+Implements the PC-1 permutation used to transform the original 64-bit key into 56 bits.
+
+`circular_shift.rs`  
+Implements the circular shifts applied to the two 28-bit key halves during key scheduling.
+
+`second_key_permutation.rs`  
+Implements PC-2 to generate the 48-bit DES round keys.
+
+`feistel.rs`  
+Contains the main components of the DES Feistel network:
+
+- Expansion permutation
+- XOR operation
+- S-Boxes
+- P permutation
+- Feistel function
+- Feistel rounds
+- Final DES permutation
+
+`main.rs`  
+Integrates and tests the different components of the algorithm.
+
+## Technologies
+
+- **Rust**
+- **Cargo**
+- Cryptography fundamentals
+- Symmetric block ciphers
+- Feistel networks
+- Bit-level operations
+
+## Running the Project
+
+Make sure Rust and Cargo are installed.
+
+Clone the repository:
+
+```bash
+git clone https://github.com/AmmarSo/Chiffrement_DES.git
+cd Chiffrement_DES
+```
+
+Then run:
+
+```bash
+cargo run
+```
+
+## Development Status
+
+This repository is a **work in progress** developed during a university cryptography course.
+
+The main internal components of DES are implemented separately, while the complete encryption/decryption pipeline is being progressively integrated and tested.
+
+## Educational Purpose
+
+The purpose of this project is not to provide a production-ready cryptographic implementation.
+
+It was created to understand concepts such as:
+
+- Block cipher architecture
+- Feistel networks
+- Key scheduling
+- Permutations
+- Substitution boxes
+- XOR-based transformations
+- Low-level data manipulation in Rust
+
+Engineering student interested in software engineering, artificial intelligence and computer science.
+
+GitHub: [AmmarSo](https://github.com/AmmarSo)
