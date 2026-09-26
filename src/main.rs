@@ -10,76 +10,78 @@ use initial_permutation::initial_permutation;
 use key_permutation::key_permutation;
 use circular_shift::circular_shift;
 use second_key_permutation::second_key_permutation;
+use feistel::{des_rounds, permutation_finale};
+
+pub fn des(input_hex: &str, k: &str, sens: bool) -> String {
+    let conversion = false;
+
+    let binaire = hexa2binars(input_hex, &conversion);
+    let binary_key = hexa2binars(k, &conversion);
+
+    let perm_vec = initial_permutation(&binaire, &conversion);
+
+    let l0: String = perm_vec[0..32]
+        .iter()
+        .map(|b| (b + b'0') as char)
+        .collect();
+
+    let r0: String = perm_vec[32..64]
+        .iter()
+        .map(|b| (b + b'0') as char)
+        .collect();
+
+    let key_56 = key_permutation(&binary_key, &conversion);
+
+    let mut c = key_56[0..28].to_vec();
+    let mut d = key_56[28..56].to_vec();
+
+    let mut keys: Vec<String> = Vec::new();
+
+    for round in 1..=16 {
+        let (new_c, new_d) = circular_shift(&c, &d, round, &conversion);
+
+        c = new_c;
+        d = new_d;
+
+        let key_vec = second_key_permutation(&c, &d, &conversion);
+
+        let key: String = key_vec
+            .iter()
+            .map(|b| (b + b'0') as char)
+            .collect();
+
+        keys.push(key);
+    }
+
+    if sens {
+        keys.reverse();
+    }
+
+    let (l16, r16) = des_rounds(&l0, &r0, &keys);
+
+    let preoutput = format!("{}{}", r16, l16);
+    let final_bin = permutation_finale(&preoutput);
+
+    let inverse = true;
+    hexa2binars(&final_bin, &inverse)
+}
 
 pub fn chiffrement(input_hex: &str, k: &str) -> String {
-    let sens = false;
-    
-    // Passage du message et de la clé en binaire (64 bits)
-    let binaire = hexa2binars(input_hex, &sens);
-    let binary_key = hexa2binars(k, &sens);
-    
-    // Permutations initiales (IP et PC-1)
-    let perm_vec = initial_permutation(&binaire, &sens);
-    let key_56 = key_permutation(&binary_key, &sens);
-    
-    // Séparation du bloc de données en deux moitiés
-    let _l0 = &perm_vec[0..32];
-    let _r0 = &perm_vec[32..64];
-
-    // Séparation de la clé en C0 et D0 (28 bits chacun)
-    let c = &key_56[0..28];
-    let d = &key_56[28..56];
-
-    // Exemple pour le tour 1 : décalage puis génération de la sous-clé K1 (PC-2)
-    let (c1, d1) = circular_shift(c, d, 1, &sens);
-    let k1 = second_key_permutation(&c1, &d1, &sens);
-    
-    println!("Taille de la sous-clé K1 générée : {} bits", k1.len());
-
-    // Retourne le bloc après IP sous forme de chaîne (pour l'instant)
-    perm_vec.iter().map(|b| (b + b'0') as char).collect()
+    des(input_hex, k, false)
 }
 
-pub fn dechiffrement(input_perm_bin: &str, _k: &str) -> String {
-    let sens = true;
-    
-    // Permutation inverse IP^-1
-    let bin_vec = initial_permutation(input_perm_bin, &sens);
-    
-    // Recolement des morceaux (réciproque de la séparation)
-    let l_final = &bin_vec[0..32];
-    let r_final = &bin_vec[32..64];
-    let combined_vec: Vec<u8> = [l_final, r_final].concat();
-    
-    let bin_str: String = combined_vec.iter().map(|b| (b + b'0') as char).collect();
-    
-    // Retour au format hexadécimal d'origine
-    hexa2binars(&bin_str, &sens)
+pub fn dechiffrement(input_hex: &str, k: &str) -> String {
+    des(input_hex, k, true)
 }
-
-use crate::feistel::{permutation_p, sboxes, xor48};
 
 fn main() {
     let message_origine = "0123456789ABCDEF";
     let k = "133457799BBCDFF1";
-    
-    println!("L'hexadécimal {} en binaire est : {}", mon_nombre, resultat);
-    println!("La table initial de permutation est : {:?}", initial_perm_table);
 
+    let message_chiffre = chiffrement(message_origine, k);
+    let message_dechiffre = dechiffrement(&message_chiffre, k);
 
-    let r0 = "F0AAF0AA";
-    let k1 = "000110110000001011101111111111000111000001110010";
-
-
-    let expansion = feistel::expansion_r(r0);
-    let xor_result = xor48(r0, k1);
-    let sbox_ = sboxes(&xor_result);
-    let p = permutation_p(&sbox_);
-
-
-    println!("Expansion R : {}", expansion);
-    println!("XOR : {}", xor_result);
-    println!("Sboxes : {}", sbox_);
-
-
+    println!("Message original : {}", message_origine);
+    println!("Message chiffré : {}", message_chiffre);
+    println!("Message déchiffré : {}", message_dechiffre);
 }
