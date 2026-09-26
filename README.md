@@ -1,6 +1,6 @@
 # DES Implementation in Rust
 
-This repository contains a **Rust implementation of the Data Encryption Standard (DES)** developed as part of a **university project in cryptography and security protocols**.
+This repository contains a **Rust implementation of the Data Encryption Standard (DES)** developed as part of a **engineering school (EPISEN) project in cryptography and security protocols**.
 
 The main objective of this project is educational: implementing the different components of DES manually in order to better understand the internal mechanisms of a symmetric block cipher.
 
